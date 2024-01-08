@@ -1,84 +1,132 @@
-import React, { useState } from 'react';
-import {SafeAreaView,StatusBar, TouchableWithoutFeedback,StyleSheet,View,} from 'react-native';
+import React, { useState, useLayoutEffect } from 'react';
+import { SafeAreaView, StatusBar, ImageBackground, TouchableWithoutFeedback, StyleSheet, View, Image, Dimensions } from 'react-native';
 import { Avatar, Text } from 'react-native-paper';
 import LinearGradient from 'react-native-linear-gradient';
+import { useNavigation } from '@react-navigation/native';
 
+
+const avatarData = [
+  { id: 1, role: 'FARMER', image: require("../images/farmer.png") },
+  { id: 2, role: 'VENDOR', image: require("../images/vendor.png") },
+  { id: 3, role: 'PILOT', image: require("../images/pilot.png") },
+];
+
+const { height } = Dimensions.get('window');
 
 const LandingScreen = (props) => {
-  const [isHovered1, setIsHovered1] = useState(false);
-  const [isHovered2, setIsHovered2] = useState(false);
-  const [isHovered3, setIsHovered3] = useState(false);
+  const [isHovered, setIsHovered] = useState("");
 
-  const handlePressIn1 = () => {
-    setIsHovered1(true);
-  };
+  const navigation = useNavigation();
+  useLayoutEffect(() => {
+    navigation.setOptions({
+      headerShown: false,
+    });
+  }, [navigation]);
 
-  const handlePressOut1 = () => {
-    setIsHovered1(false);
-  };
-  const handlePressIn2 = () => {
-    setIsHovered2(true);
+  const handlePressIn = (id) => {
+    setIsHovered(id);
   };
 
-  const handlePressOut2 = () => {
-    setIsHovered2(false);
-  };
-  const handlePressIn3 = () => {
-    setIsHovered3(true);
+  const handlePressOut = (id) => {
+    setIsHovered("");
   };
 
-  const handlePressOut3 = () => {
-    setIsHovered3(false);
-  };
-
-  const handlePress= ()=>{
-    props.navigation.navigate('Login');
+  const handlePress = (roleId) => {
+    if (roleId === 1)
+      props.navigation.navigate('Login', { roleId });
+    else
+      props.navigation.navigate('VendorLogin', { roleId });
   }
 
   return (
-      <LinearGradient colors={['grey', '#3b5998', 'grey']} style={{flex:1}}>
-        <View style={styles.parent} >
-          <TouchableWithoutFeedback onPressIn={handlePressIn1} onPressOut={handlePressOut1} onPress={handlePress}>
-            <View style={[styles.avtarView, isHovered1&&styles.hoveredContainer ]} >
-              <Avatar.Image size={isHovered1?80:90} source={require("../images/farmer.png")} />
-              <Text style={{fontSize:24}}>Farmer</Text>
-            </View>
-          </TouchableWithoutFeedback>
-          <TouchableWithoutFeedback onPressIn={handlePressIn2} onPressOut={handlePressOut2}>
-            <View style={[styles.avtarView, isHovered2&&styles.hoveredContainer ]} >
-              <Avatar.Image size={isHovered2?80:90} source={require("../images/vendor.png")} />
-              <Text style={{fontSize:24}}>Vendor</Text>
-            </View>
-          </TouchableWithoutFeedback>
-          <TouchableWithoutFeedback onPressIn={handlePressIn3} onPressOut={handlePressOut3}>
-            <View style={[styles.avtarView, isHovered3&&styles.hoveredContainer ]} >
-              <Avatar.Image size={isHovered3?80:90} source={require("../images/pilot.png")} />
-              <Text style={{fontSize:24}}>Pilot</Text>
-            </View>
-          </TouchableWithoutFeedback>
+    <LinearGradient colors={['white', 'white']} style={styles.parent}>
+      <ImageBackground source={{ uri: 'https://res.cloudinary.com/surajsehgal/image/upload/v1704562670/garuda/j8myv7rf16uhpaixtfbw.png' }} style={styles.backgroundImage}>
+        <View style={styles.imageView}>
+          <Image style={styles.image} source={{uri:'https://res.cloudinary.com/surajsehgal/image/upload/v1704563610/garuda/ppjjbhxdrryqirsurtyn.png'}}/>
         </View>
-      </LinearGradient>
+        <View style={styles.option} >
+          <Text style={styles.h1}>Select Option</Text>
+          <View style={styles.flexView}>
+            {avatarData?.map((avatar) => (<TouchableWithoutFeedback key={avatar.id} onPressIn={() => handlePressIn(avatar.id)} onPressOut={() => handlePressOut(avatar.id)} onPress={() => handlePress(avatar.id)}>
+              <View style={[styles.avtarView]} >
+                <Text style={styles.text}>{avatar.role}</Text>
+                <Avatar.Image style={{ backgroundColor: 'white' }} size={isHovered === avatar.id ? 35 : 30} source={avatar.image} />
+              </View>
+            </TouchableWithoutFeedback>))}
+          </View>
+        </View>
+      </ImageBackground>
+    </LinearGradient>
   );
 }
 
 const styles = StyleSheet.create({
-  parent:{
-    flex:1,
-    flexDirection:'row',
-    gap:30,
-    alignItems:'center',
-    justifyContent:'center',
-    position:'absolute',
-    width:'100%',
-    height:'100%'
+  parent: {
+    flex: 1,
+    position: 'absolute',
+    width: '100%',
+    height: '100%',
   },
-  avtarView:{
-    justifyContent:'center',
-    alignItems:'center',
+  backgroundImage: {
+    width: '100%',
+    height: '100%',
   },
-  hoveredContainer: {
-    backgroundColor: '#1d2b49', 
+  imageView:{
+    top:70,
+    alignSelf:'center'
   },
+  image:{
+    height:70,
+    width:230,
+  },
+  option: {
+    bottom: 0,
+    position: 'absolute',
+    borderTopRightRadius: 30,
+    borderTopLeftRadius: 30,
+    width: '100%',
+    height: 300,
+    justifyContent: 'center',
+    alignItems: 'center',
+    backgroundColor: 'white',
+  },
+
+  avtarView: {
+    width: 300,
+    flexDirection: 'row',
+    justifyContent: 'space-between',
+    alignItems: 'center',
+    backgroundColor: 'white',
+    borderRadius: 20,
+    borderWidth: 1.5,
+    borderColor: 'black',
+    paddingLeft: 20,
+    paddingRight: 20,
+    padding: 10,
+    elevation: 10,
+    ios: {
+      shadowColor: 'black',
+      shadowOffset: { width: 0, height: 2 },
+      shadowOpacity: 0.3,
+      shadowRadius: 4,
+    },
+  },
+
+  text: {
+    fontSize: 20,
+    color: 'black',
+    fontWeight: '600'
+  },
+  h1: {
+    fontSize: 26,
+    fontWeight: 'bold',
+    marginBottom: 20,
+  },
+  flexView:{
+    gap:15,
+    
+  },
+
 })
 
 
